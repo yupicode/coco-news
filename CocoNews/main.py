@@ -127,7 +127,7 @@ def purger_doublons_existants(doc):
         
 if __name__ == '__main__':
     new_articles = []
-    with open("News.html", "r", encoding="utf-8") as f:
+    with open("index.html", "r", encoding="utf-8") as f:
         doc = BeautifulSoup(f, "html.parser")
     new_articles.extend(scrap_all(URLS,new_articles,doc))
     if len(new_articles) > 0 :
@@ -141,5 +141,5 @@ if __name__ == '__main__':
         if len(all_articles) > 1000:
             for old_art in all_articles[1000:]:
                 old_art.decompose()
-        with open("News.html", "w", encoding="utf-8") as f:
+        with open("index.html", "w", encoding="utf-8") as f:
             f.write(doc.prettify())
