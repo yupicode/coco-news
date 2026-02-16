@@ -3541,34 +3541,59 @@
 
         // Validation
         if (!title || !url || !source || !sourceUrl) {
-            alert('Veuillez remplir tous les champs');
+            alert('Veuillez remplir tous les champs : titre, URL de l\'article, source et URL de la source');
             return;
         }
 
-        // Get current date and time
+        // Get current date and time with reliable formatting
         const now = new Date();
-        const date = now.toLocaleDateString('fr-FR').replace(/\//g, '-').split('-').reverse().join('-');
-        const time = now.toTimeString().slice(0, 5);
-        const displayDate = now.toLocaleDateString('fr-FR') + ' à ' + time;
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        const date = `${day}-${month}-${year}`;
+        const time = `${hours}:${minutes}`;
+        const displayDate = `${day}/${month}/${year} à ${time}`;
 
-        // Create new article element
+        // Create new article element using DOM methods to prevent XSS
         const content = document.querySelector('.content');
         const newArticle = document.createElement('article');
         
-        newArticle.innerHTML = `
-    <div class="meta-bar">
-     <a class="src" href="${sourceUrl}" target="_blank">
-      ${source}
-     </a>
-     <time datetime="${date}T${time}">
-      ${displayDate}
-     </time>
-    </div>
-    <a href="${url}" target="_blank">
-     <h1>
-      ${title}
-     </h1>
-    </a>`;
+        // Create meta-bar div
+        const metaBar = document.createElement('div');
+        metaBar.className = 'meta-bar';
+        
+        // Create source link
+        const srcLink = document.createElement('a');
+        srcLink.className = 'src';
+        srcLink.href = sourceUrl;
+        srcLink.target = '_blank';
+        srcLink.textContent = source;
+        
+        // Create time element
+        const timeElem = document.createElement('time');
+        timeElem.setAttribute('datetime', `${date}T${time}`);
+        timeElem.textContent = displayDate;
+        
+        metaBar.appendChild(srcLink);
+        metaBar.appendChild(timeElem);
+        
+        // Create article link
+        const articleLink = document.createElement('a');
+        articleLink.href = url;
+        articleLink.target = '_blank';
+        
+        // Create title
+        const h1 = document.createElement('h1');
+        h1.textContent = title;
+        
+        articleLink.appendChild(h1);
+        
+        // Assemble the article
+        newArticle.appendChild(metaBar);
+        newArticle.appendChild(articleLink);
 
         // Insert at the beginning of content
         content.insertBefore(newArticle, content.firstChild);
