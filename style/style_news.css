@@ -34,6 +34,8 @@ header {
 header .header{
     width:100%;
     height:auto;
+    top:0;
+    position:absolute;
 }
 .site-bar {
     background-color : rgb(255,0,0);
