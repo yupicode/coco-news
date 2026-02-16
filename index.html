@@ -26,6 +26,28 @@
     Ceci est un test
    </div>
   </header>
+  <div class="add-article-container">
+   <button class="add-article-btn" id="addArticleBtn" onclick="toggleAddArticleForm()">
+    + Ajouter un article
+   </button>
+   <div class="add-article-form" id="addArticleForm" style="display: none;">
+    <h3>
+     Ajouter un nouvel article
+    </h3>
+    <input id="newArticleTitle" placeholder="Titre de l'article" type="text"/>
+    <input id="newArticleUrl" placeholder="URL de l'article" type="url"/>
+    <input id="newArticleSource" placeholder="Source (ex: Le Monde)" type="text"/>
+    <input id="newArticleSourceUrl" placeholder="URL de la source" type="url"/>
+    <div class="form-buttons">
+     <button class="submit-btn" onclick="addNewArticle()">
+      Ajouter
+     </button>
+     <button class="cancel-btn" onclick="toggleAddArticleForm()">
+      Annuler
+     </button>
+    </div>
+   </div>
+  </div>
   <div class="content">
    <article>
     <div class="meta-bar">
@@ -3493,6 +3515,71 @@
    let currentPage = 1;
     const itemsPerPage = 30;
     let isSearching = false;
+
+    function toggleAddArticleForm() {
+        const form = document.getElementById('addArticleForm');
+        const btn = document.getElementById('addArticleBtn');
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            btn.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            btn.style.display = 'block';
+            // Reset form
+            document.getElementById('newArticleTitle').value = '';
+            document.getElementById('newArticleUrl').value = '';
+            document.getElementById('newArticleSource').value = '';
+            document.getElementById('newArticleSourceUrl').value = '';
+        }
+    }
+
+    function addNewArticle() {
+        const title = document.getElementById('newArticleTitle').value.trim();
+        const url = document.getElementById('newArticleUrl').value.trim();
+        const source = document.getElementById('newArticleSource').value.trim();
+        const sourceUrl = document.getElementById('newArticleSourceUrl').value.trim();
+
+        // Validation
+        if (!title || !url || !source || !sourceUrl) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
+
+        // Get current date and time
+        const now = new Date();
+        const date = now.toLocaleDateString('fr-FR').replace(/\//g, '-').split('-').reverse().join('-');
+        const time = now.toTimeString().slice(0, 5);
+        const displayDate = now.toLocaleDateString('fr-FR') + ' à ' + time;
+
+        // Create new article element
+        const content = document.querySelector('.content');
+        const newArticle = document.createElement('article');
+        
+        newArticle.innerHTML = `
+    <div class="meta-bar">
+     <a class="src" href="${sourceUrl}" target="_blank">
+      ${source}
+     </a>
+     <time datetime="${date}T${time}">
+      ${displayDate}
+     </time>
+    </div>
+    <a href="${url}" target="_blank">
+     <h1>
+      ${title}
+     </h1>
+    </a>`;
+
+        // Insert at the beginning of content
+        content.insertBefore(newArticle, content.firstChild);
+
+        // Close form and reset
+        toggleAddArticleForm();
+        
+        // Update display
+        currentPage = 1;
+        updateDisplay();
+    }
 
     function hideVisualDuplicates() {
     let seen = {};
