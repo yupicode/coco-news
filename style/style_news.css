@@ -41,7 +41,9 @@ header .header{
     height:25px;
     position:absolute;
     top:100px;
-    color:white
+    color:white;
+    text-align:center;
+    font-weight: 900;
 }
 
 header h2 {
