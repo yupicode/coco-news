@@ -22,6 +22,28 @@
     <img class="site-icon" src="assets/images/coco.png"/>
    </div>
   </header>
+  <div class="add-article-container">
+   <button class="add-article-btn" id="addArticleBtn" onclick="toggleAddArticleForm()">
+    + Ajouter un article
+   </button>
+   <div class="add-article-form" id="addArticleForm" style="display: none;">
+    <h3>
+     Ajouter un nouvel article
+    </h3>
+    <input id="newArticleTitle" placeholder="Titre de l'article" type="text"/>
+    <input id="newArticleUrl" placeholder="URL de l'article" type="url"/>
+    <input id="newArticleSource" placeholder="Source (ex: Le Monde)" type="text"/>
+    <input id="newArticleSourceUrl" placeholder="URL de la source" type="url"/>
+    <div class="form-buttons">
+     <button class="submit-btn" onclick="addNewArticle()">
+      Ajouter
+     </button>
+     <button class="cancel-btn" onclick="toggleAddArticleForm()">
+      Annuler
+     </button>
+    </div>
+   </div>
+  </div>
   <div class="content">
    <article>
     <div class="meta-bar">
@@ -3489,6 +3511,96 @@
    let currentPage = 1;
     const itemsPerPage = 30;
     let isSearching = false;
+
+    function toggleAddArticleForm() {
+        const form = document.getElementById('addArticleForm');
+        const btn = document.getElementById('addArticleBtn');
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            btn.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            btn.style.display = 'block';
+            // Reset form
+            document.getElementById('newArticleTitle').value = '';
+            document.getElementById('newArticleUrl').value = '';
+            document.getElementById('newArticleSource').value = '';
+            document.getElementById('newArticleSourceUrl').value = '';
+        }
+    }
+
+    function addNewArticle() {
+        const title = document.getElementById('newArticleTitle').value.trim();
+        const url = document.getElementById('newArticleUrl').value.trim();
+        const source = document.getElementById('newArticleSource').value.trim();
+        const sourceUrl = document.getElementById('newArticleSourceUrl').value.trim();
+
+        // Validation
+        if (!title || !url || !source || !sourceUrl) {
+            alert('Veuillez remplir tous les champs : titre, URL de l\'article, source et URL de la source');
+            return;
+        }
+
+        // Get current date and time with reliable formatting
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        const date = `${day}-${month}-${year}`;
+        const time = `${hours}:${minutes}`;
+        const displayDate = `${day}/${month}/${year} à ${time}`;
+
+        // Create new article element using DOM methods to prevent XSS
+        const content = document.querySelector('.content');
+        const newArticle = document.createElement('article');
+        
+        // Create meta-bar div
+        const metaBar = document.createElement('div');
+        metaBar.className = 'meta-bar';
+        
+        // Create source link
+        const srcLink = document.createElement('a');
+        srcLink.className = 'src';
+        srcLink.href = sourceUrl;
+        srcLink.target = '_blank';
+        srcLink.textContent = source;
+        
+        // Create time element
+        const timeElem = document.createElement('time');
+        timeElem.setAttribute('datetime', `${date}T${time}`);
+        timeElem.textContent = displayDate;
+        
+        metaBar.appendChild(srcLink);
+        metaBar.appendChild(timeElem);
+        
+        // Create article link
+        const articleLink = document.createElement('a');
+        articleLink.href = url;
+        articleLink.target = '_blank';
+        
+        // Create title
+        const h1 = document.createElement('h1');
+        h1.textContent = title;
+        
+        articleLink.appendChild(h1);
+        
+        // Assemble the article
+        newArticle.appendChild(metaBar);
+        newArticle.appendChild(articleLink);
+
+        // Insert at the beginning of content
+        content.insertBefore(newArticle, content.firstChild);
+
+        // Close form and reset
+        toggleAddArticleForm();
+        
+        // Update display
+        currentPage = 1;
+        updateDisplay();
+    }
 
     function hideVisualDuplicates() {
     let seen = {};
